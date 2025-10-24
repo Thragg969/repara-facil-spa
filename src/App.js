@@ -1,25 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppNavbar from "./components/AppNavbar";
+import AppRoutes from "./app/routes";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <AppNavbar />
+        <main className="flex-grow container mx-auto px-4 py-6">
+          <AppRoutes />
+        </main>
+        <footer className="bg-blue-600 text-white text-center py-3 mt-6">
+          <p>© 2025 ReparaFácil SPA - Todos los derechos reservados</p>
+        </footer>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;

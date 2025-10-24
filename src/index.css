@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Suaves sombras y hover en cards */
+.card.shadow-sm.h-100.border-0:hover {
+  transform: translateY(-2px);
+  transition: transform 120ms ease;
+}
+
