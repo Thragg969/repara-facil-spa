@@ -1,33 +1,48 @@
-import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
-import { SERVICES, TECHS } from "../data/mock.js";
+import React, { createContext, useContext, useMemo, useState } from "react";
+
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [servicios] = useState(SERVICES);
-  const [tecnicos]  = useState(TECHS);
+  // ====== tus estados actuales ======
+  const [servicios, setServicios] = useState([]);
+  const [tecnicos, setTecnicos] = useState([]);
+  const [agenda, setAgenda] = useState([]);
 
-  // carga inicial desde localStorage
-  const [agenda, setAgenda] = useState(() => {
-    try {
-      const raw = localStorage.getItem("reparafacil_agenda");
-      return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
-  });
+  // ====== tus funciones originales ======
+  const addCita = (nuevaCita) => setAgenda((prev) => [...prev, nuevaCita]);
+  const removeCita = (id) => setAgenda((prev) => prev.filter((c) => c.id !== id));
 
-  // guarda cada cambio
-  useEffect(() => {
-    localStorage.setItem("reparafacil_agenda", JSON.stringify(agenda));
-  }, [agenda]);
+  // ======  NUEVO BLOQUE (contador global) ======
+  const [counter, setCounter] = useState(0);
+  const add = () => setCounter((c) => c + 1);
+  const reset = () => setCounter(0);
 
-  const addCita = (cita) => setAgenda(prev => [...prev, cita]);
-  const removeCita = (id) => setAgenda(prev => prev.filter(c => c.id !== id));
+  // ====== value con todo lo que expones ======
+  const value = useMemo(
+    () => ({
+      servicios,
+      tecnicos,
+      agenda,
+      addCita,
+      removeCita,
+      // 👇 nuevo agregado
+      counter,
+      add,
+      reset,
+    }),
+    [servicios, tecnicos, agenda, counter]
+  );
 
-  const value = useMemo(() => ({
-    servicios, tecnicos, agenda, addCita, removeCita
-  }), [servicios, tecnicos, agenda]);
-
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      {children}
+    </AppContext.Provider>
+  );
 }
 
-export const useApp = () => useContext(AppContext);
+export function useApp() {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error("useApp debe usarse dentro de AppProvider");
+  return ctx;
+}

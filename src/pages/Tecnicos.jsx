@@ -3,23 +3,33 @@ import { useApp } from "../context/AppContext.jsx";
 
 export default function Tecnicos() {
   const { tecnicos } = useApp();
+
+  // --- MOCK DE TÉCNICOS (solo si el contexto está vacío) ---
+  const tecnicosMock = [
+    { id: "t1", nombre: "Carlos Pérez", especialidad: "Lavadoras" },
+    { id: "t2", nombre: "María Torres", especialidad: "Electricidad" },
+    { id: "t3", nombre: "José Ramírez", especialidad: "Refrigeración" },
+  ];
+
+  // Si no hay técnicos en contexto, usamos el mock
+  const listaTecnicos = tecnicos?.length ? tecnicos : tecnicosMock;
+
   return (
-    <>
+    <div className="container py-4">
       <h2 className="mb-3">Técnicos</h2>
+
+      {/* Aquí va el bloque que tú pusiste */}
       <div className="row g-3">
-        {tecnicos.map(t => (
-          <div key={t.id} className="col-md-6 col-lg-4">
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title mb-1">{t.nombre}</h5>
-                <p className="text-muted small mb-2">{t.especialidad} · {t.ciudad}</p>
-                <p className="mb-2">⭐ {t.rating} / 5</p>
-                <p className="small">{t.bio}</p>
-              </div>
+        {listaTecnicos.map((t) => (
+          <div key={t.id} className="col-md-4">
+            <div className="card h-100 p-3 text-center">
+              <h5>{t.nombre}</h5>
+              <p className="text-muted small">{t.especialidad}</p>
             </div>
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 }
+

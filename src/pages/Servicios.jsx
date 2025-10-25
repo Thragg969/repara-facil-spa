@@ -1,64 +1,95 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import ServiceCard from "../components/ServiceCard.jsx";
 
 export default function Servicios() {
   const { servicios } = useApp();
-  const [q, setQ] = useState("");
+
+  const serviciosMock = [
+    {
+      id: "s1",
+      nombre: "Reparación de Lavadora",
+      categoria: "Electrodomésticos",
+      duracion: "2 horas",
+      nivel: "Básico",
+      precio: 25000,
+      descripcion: "Servicio completo de diagnóstico y reparación de lavadoras.",
+    },
+    {
+      id: "s2",
+      nombre: "Instalación Eléctrica",
+      categoria: "Electricidad",
+      duracion: "1 hora",
+      nivel: "Intermedio",
+      precio: 18000,
+      descripcion: "Instalación y revisión de puntos eléctricos domiciliarios.",
+    },
+  ];
+
+  const listaServicios = servicios?.length ? servicios : serviciosMock;
+
+  // 👇 Nuevo: estados para filtros
+  const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState("todas");
 
-  // categorías únicas
-  const categorias = useMemo(() => ["todas", ...new Set(servicios.map(s => s.categoria))], [servicios]);
-
-  const filtrados = useMemo(() => {
-    const texto = q.trim().toLowerCase();
-    return servicios.filter(s => {
-      const byCat = categoria === "todas" || s.categoria === categoria;
-      const byText =
-        !texto ||
-        s.nombre.toLowerCase().includes(texto) ||
-        s.descripcion.toLowerCase().includes(texto);
-      return byCat && byText;
+  // 👇 Lógica del filtro
+  const serviciosFiltrados = useMemo(() => {
+    return listaServicios.filter((s) => {
+      const matchSearch = s.nombre.toLowerCase().includes(search.toLowerCase());
+      const matchCategoria =
+        categoria === "todas" || s.categoria === categoria;
+      return matchSearch && matchCategoria;
     });
-  }, [servicios, q, categoria]);
+  }, [listaServicios, search, categoria]);
+
+  // 👇 categorías dinámicas
+  const categorias = ["todas", ...new Set(listaServicios.map((s) => s.categoria))];
 
   return (
-    <>
+    <div className="container py-4">
       <h2 className="mb-3">Servicios</h2>
 
-      {/* Filtros */}
+      {/* Filtros funcionales */}
       <div className="row g-2 mb-3">
         <div className="col-md-6">
           <input
             className="form-control"
             placeholder="Buscar por nombre o descripción…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <div className="col-md-4">
-          <select className="form-select" value={categoria} onChange={e => setCategoria(e.target.value)}>
-            {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+          <select
+            className="form-select"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+          >
+            {categorias.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Lista de resultados filtrados */}
       <div className="row g-3">
-        {filtrados.length === 0 ? (
+        {serviciosFiltrados.length > 0 ? (
+          serviciosFiltrados.map((s) => (
+            <div className="col-md-6 col-lg-4" key={s.id}>
+              <ServiceCard service={s} />
+            </div>
+          ))
+        ) : (
           <div className="col-12">
             <div className="alert alert-warning mb-0">
               No encontramos servicios con esos filtros.
             </div>
           </div>
-        ) : (
-          filtrados.map(s => (
-            <div key={s.id} className="col-md-6 col-lg-4">
-              <ServiceCard service={s} />
-            </div>
-          ))
         )}
       </div>
-    </>
+    </div>
   );
 }

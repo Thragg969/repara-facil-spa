@@ -1,19 +1,25 @@
-// Usa el entrypoint especial para Vitest (no el de Jest)
-import { vi, expect } from 'vitest';
-import '@testing-library/jest-dom/vitest';
-import '@testing-library/jest-dom'
+// tests/setupTests.js
 
-// Silenciar warnings de React Router v7 future flags en tests
-const origWarn = console.warn;
+// Limpieza entre tests (opcional pero sano)
+import { afterEach } from "vitest";
+import { cleanup } from "@testing-library/react";
+afterEach(() => cleanup());
 
-beforeAll(() => {
-  vi.spyOn(console, 'warn').mockImplementation((...args) => {
-    const msg = (args?.[0] || '').toString();
-    if (msg.includes('React Router Future Flag Warning')) return;
-    origWarn(...args);
-  });
-});
+// jest-dom para Vitest (¡esta variante!)
+import "@testing-library/jest-dom/vitest";
 
-afterAll(() => {
-  console.warn.mockRestore?.();
-});
+// Polyfill para crypto.randomUUID (jsdom)
+if (!global.crypto) {
+  // @ts-ignore
+  global.crypto = {};
+}
+if (!global.crypto.randomUUID) {
+  // @ts-ignore
+  global.crypto.randomUUID = () =>
+    "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+}
+

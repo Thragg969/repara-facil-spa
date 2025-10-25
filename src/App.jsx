@@ -9,6 +9,7 @@ import Servicios from "./pages/Servicios.jsx";
 import Agenda from "./pages/Agenda.jsx";
 import Garantias from "./pages/Garantias.jsx";
 import Tecnicos from "./pages/Tecnicos.jsx";
+import Contact from "./pages/Contact.jsx";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/garantias" element={<Garantias />} />
           <Route path="/tecnicos" element={<Tecnicos />} />
+          <Route path="/contacto" element={<Contact />} />
         </Routes>
       </main>
       <Footer />

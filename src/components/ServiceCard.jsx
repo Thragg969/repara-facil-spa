@@ -3,7 +3,9 @@ import { useApp } from "../context/AppContext.jsx";
 import ScheduleModal from "./ScheduleModal.jsx";
 
 export default function ServiceCard({ service }) {
-  const { addCita } = useApp();
+  // ⬇️ antes: const { addCita } = useApp();
+  const { addCita, add } = useApp(); // 🔹 NUEVO: traemos add del contexto
+
   const [cliente, setCliente] = useState("");
   const [direccion, setDireccion] = useState("");
   const [fecha, setFecha] = useState("");
@@ -75,10 +77,12 @@ export default function ServiceCard({ service }) {
               onChange={(e) => setFecha(e.target.value)}
             />
           </div>
+
           <div className="col-12 d-flex gap-2">
             <button type="submit" className="btn btn-primary flex-fill">
               Agendar
             </button>
+
             <button
               type="button"
               className="btn btn-outline-secondary flex-fill"
@@ -86,6 +90,17 @@ export default function ServiceCard({ service }) {
               onClick={() => setShowModal(true)}
             >
               Ver detalles
+            </button>
+
+            {/* 🔹 NUEVO: botón “Agregar” que incrementa el contador global (no envía el form) */}
+            <button
+              type="button"
+              className="btn btn-outline-primary flex-fill"
+              onClick={add}
+              aria-label="Agregar"
+              data-testid="btn-agregar"
+            >
+              Agregar
             </button>
           </div>
         </form>
