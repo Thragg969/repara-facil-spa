@@ -1,10 +1,17 @@
 import React from "react";
-import HeroSection from "../components/HeroSection.jsx";
+import { useNavigate } from "react-router-dom";
 import TechnicianCard from "../components/TechnicianCard.jsx";
 import Testimonials from "../components/Testimonials.jsx";
 import { TECHS } from "../data/mock.js";
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  const irAServicios = (e) => {
+    e.preventDefault();
+    navigate("/servicios");
+  };
+
   return (
     <>
       {/* Encabezado principal esperado por los tests */}
@@ -16,20 +23,19 @@ export default function Home() {
           <p className="text-muted mb-4">
             Tu reparación fácil, rápida y segura 🔧
           </p>
-          <a
-            role="button"
-            href="/servicios"
+
+          {/* Botón (no <a>) para mantener los tests y navegar con Router */}
+          <button
             className="btn btn-primary px-4 py-2"
+            onClick={irAServicios}
           >
             Ver servicios
-          </a>
+          </button>
         </div>
       </section>
 
       <section className="container py-5">
-        <h2 className="text-center mb-4 text-primary">
-          Técnicos destacados 👨‍🔧
-        </h2>
+        <h2 className="text-center mb-4 text-primary">Técnicos destacados 👨‍🔧</h2>
         <div className="row">
           {TECHS.map((tech) => (
             <TechnicianCard key={tech.id} tech={tech} />
