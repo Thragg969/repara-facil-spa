@@ -1,9 +1,21 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useApp } from "../context/AppContext.jsx"; // 👈 importa el contexto
+import React, { useMemo, useState } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useApp } from "../context/AppContext.jsx";
+import { SERVICES } from "../data/mock.js";
 
 export default function AppNavbar() {
-  const { counter } = useApp(); // 👈 contador global del contexto
+  const { counter } = useApp();
+  const [open, setOpen] = useState(false);
+  const [openServicios, setOpenServicios] = useState(false);
+  const navigate = useNavigate();
+
+  const serviciosMenu = useMemo(() => SERVICES.slice(0, 6), []);
+
+  const goServicio = (id) => {
+    navigate("/servicios");
+    setOpen(false);
+    setOpenServicios(false);
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-4">
@@ -12,51 +24,117 @@ export default function AppNavbar() {
           🔧 ReparaFácil SPA
         </Link>
 
+        {/* Hamburguesa móvil */}
         <button
           className="navbar-toggler"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navRF"
+          aria-label="Abrir menú"
+          aria-controls="mainNavbar"
+          aria-expanded={open ? "true" : "false"}
+          onClick={() => setOpen((v) => !v)}
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div id="navRF" className="collapse navbar-collapse">
-          <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+        <div
+          id="mainNavbar"
+          className={`collapse navbar-collapse ${open ? "show" : ""}`}
+        >
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link className="nav-link" to="/">
+              <NavLink
+                end
+                to="/"
+                className="nav-link"
+                onClick={() => setOpen(false)}
+              >
                 Inicio
-              </Link>
+              </NavLink>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/servicios">
+
+            {/* Dropdown Servicios (alineado con los demás) */}
+            <li className="nav-item dropdown">
+              <button
+                className="nav-link dropdown-toggle btn btn-link align-baseline px-0 py-2 text-white text-decoration-none"
+                id="serviciosDropdown"
+                aria-expanded={openServicios ? "true" : "false"}
+                onClick={() => setOpenServicios((v) => !v)}
+                style={{ verticalAlign: "middle" }}
+              >
                 Servicios
-              </Link>
+              </button>
+
+              <ul
+                className={`dropdown-menu ${openServicios ? "show" : ""}`}
+                aria-labelledby="serviciosDropdown"
+              >
+                {serviciosMenu.map((s) => (
+                  <li key={s.id}>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => goServicio(s.id)}
+                    >
+                      {s.nombre}
+                    </button>
+                  </li>
+                ))}
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <li>
+                  <NavLink
+                    to="/servicios"
+                    className="dropdown-item"
+                    onClick={() => setOpen(false)}
+                  >
+                    Ver todos los servicios
+                  </NavLink>
+                </li>
+              </ul>
             </li>
+
             <li className="nav-item">
-              <Link className="nav-link" to="/agenda">
+              <NavLink
+                to="/agenda"
+                className="nav-link"
+                onClick={() => setOpen(false)}
+              >
                 Agenda
-              </Link>
+              </NavLink>
             </li>
+
             <li className="nav-item">
-              <Link className="nav-link" to="/garantias">
+              <NavLink
+                to="/garantias"
+                className="nav-link"
+                onClick={() => setOpen(false)}
+              >
                 Garantías
-              </Link>
+              </NavLink>
             </li>
+
             <li className="nav-item">
-              <Link className="nav-link" to="/tecnicos">
+              <NavLink
+                to="/tecnicos"
+                className="nav-link"
+                onClick={() => setOpen(false)}
+              >
                 Técnicos
-              </Link>
+              </NavLink>
             </li>
-            {/* 👇 nuevo enlace de contacto */}
+
             <li className="nav-item">
-              <Link className="nav-link" to="/contacto">
+              <NavLink
+                to="/contacto"
+                className="nav-link"
+                onClick={() => setOpen(false)}
+              >
                 Contacto
-              </Link>
+              </NavLink>
             </li>
           </ul>
 
-          {/* 👇 contador visible */}
+          {/* Contador global visible (no tocar: tests dependen de esto) */}
           <div
             className="ms-3 d-flex align-items-center gap-2"
             data-testid="counter-badge"

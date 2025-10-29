@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import ScheduleModal from "./ScheduleModal.jsx";
 
-export default function ServiceCard({ service }) {
-  // ⬇️ antes: const { addCita } = useApp();
-  const { addCita, add } = useApp(); // 🔹 NUEVO: traemos add del contexto
+export default function ServiceCard({ service, preselectedTech }) {
+  const { addCita, add } = useApp();
 
   const [cliente, setCliente] = useState("");
   const [direccion, setDireccion] = useState("");
@@ -13,45 +12,65 @@ export default function ServiceCard({ service }) {
 
   if (!service) return null;
 
+  const baseCita = {
+    servicio: service?.nombre,
+    cliente,
+    direccion,
+    fecha,
+    estado: "Pendiente",
+    tecnico_id: preselectedTech?.id || null,
+    tecnico_nombre: preselectedTech?.name || null,
+  };
+
   const agendarRapido = (e) => {
     e.preventDefault();
     if (!cliente || !direccion || !fecha) return;
-    addCita({
-      id: crypto.randomUUID(),
-      servicioId: service.id,
-      cliente,
-      direccion,
-      fecha,
-    });
+
+    const nueva = {
+      id: Date.now(),
+      ...baseCita,
+    };
+    addCita(nueva);
+    if (add) add();
     setCliente("");
     setDireccion("");
     setFecha("");
-    alert("✅ Cita agendada");
+    alert("Cita agendada correctamente.");
   };
 
-  const agendarConDetalles = (payload) => {
-    addCita({
-      id: crypto.randomUUID(),
-      ...payload,
-    });
-    alert("✅ Cita agendada");
+  const agendarConDetalles = ({ cliente: c, direccion: d, fecha: f }) => {
+    const nueva = {
+      id: Date.now(),
+      ...baseCita,
+      cliente: c,
+      direccion: d,
+      fecha: f,
+    };
+    addCita(nueva);
+    if (add) add();
+    setShowModal(false);
+    alert("Cita agendada correctamente.");
+  };
+
+  const incrementarContador = () => {
+    if (add) add();
   };
 
   return (
-    <div className="card h-100" data-testid="service-card">
+    <div className="card h-100 shadow-sm" data-testid="service-card">
       <div className="card-body">
-        <h5 className="card-title">{service?.nombre}</h5>
-        <p className="card-text small text-muted mb-2">
-          {service?.categoria} · {service?.duracion} · {service?.nivel}
+        <h5 className="card-title mb-1">{service.nombre}</h5>
+        <p className="text-muted small mb-2">
+          {service.categoria} · {service.duracion} · {service.nivel}
         </p>
-        {service?.precio && (
+        {service.precio ? (
           <p className="fw-semibold mb-2">
-            $ {service.precio.toLocaleString("es-CL")}
+            ${service.precio.toLocaleString("es-CL")}
           </p>
-        )}
-        <p className="card-text">{service?.descripcion}</p>
+        ) : null}
+        <p className="mb-3">{service.descripcion}</p>
 
-        {/* Form RÁPIDO (para los tests) */}
+        {/* Form RÁPIDO */}
         <form onSubmit={agendarRapido} className="row g-2">
           <div className="col-md-4">
             <input
@@ -73,32 +92,29 @@ export default function ServiceCard({ service }) {
             <input
               type="datetime-local"
               className="form-control"
+              aria-label="Fecha y hora"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
+              step="900"
             />
           </div>
 
           <div className="col-12 d-flex gap-2">
-            <button type="submit" className="btn btn-primary flex-fill">
+            <button type="submit" className="btn btn-primary">
               Agendar
             </button>
-
             <button
               type="button"
-              className="btn btn-outline-secondary flex-fill"
-              aria-label="ver detalles"
+              className="btn btn-outline-secondary"
               onClick={() => setShowModal(true)}
             >
               Ver detalles
             </button>
-
-            {/* 🔹 NUEVO: botón “Agregar” que incrementa el contador global (no envía el form) */}
             <button
               type="button"
-              className="btn btn-outline-primary flex-fill"
-              onClick={add}
+              className="btn btn-outline-primary"
+              onClick={incrementarContador}
               aria-label="Agregar"
-              data-testid="btn-agregar"
             >
               Agregar
             </button>
@@ -106,7 +122,6 @@ export default function ServiceCard({ service }) {
         </form>
       </div>
 
-      {/* Modal */}
       <ScheduleModal
         show={showModal}
         onClose={() => setShowModal(false)}

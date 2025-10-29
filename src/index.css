@@ -12,9 +12,71 @@ code {
     monospace;
 }
 
-/* Suaves sombras y hover en cards */
-.card.shadow-sm.h-100.border-0:hover {
-  transform: translateY(-2px);
-  transition: transform 120ms ease;
+/* ==== Animación hover para técnicos (más visible y robusta) ==== */
+.card.tech-card {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
+.card.tech-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card.tech-card .tech-photo {
+  display: block;
+  transition: transform 250ms ease;
+  transform: translateZ(0);
+}
+
+.card.tech-card:hover .tech-photo {
+  transform: scale(1.04) translateY(-2px);
+}
+
+/* Cursor pointer para cards clickeables */
+.cursor-pointer { cursor: pointer; }
+
+/* En dispositivos táctiles no aplicar hover fuerte */
+@media (hover: none) {
+  .card.tech-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+
+/* === Forzar prioridad de la animación (más específica) === */
+body .card.tech-card {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  will-change: transform;
+  transform: translateZ(0);
+}
+body .card.tech-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+body .card.tech-card .tech-photo {
+  display: block;
+  transition: transform 250ms ease;
+  transform: translateZ(0);
+}
+body .card.tech-card:hover .tech-photo {
+  transform: scale(1.04) translateY(-2px);
+}
+
+/* Animación flotante */
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.tech-card {
+  animation: floatCard 4s ease-in-out infinite;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tech-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
