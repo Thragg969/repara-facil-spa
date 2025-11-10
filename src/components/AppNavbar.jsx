@@ -4,7 +4,7 @@ import { useApp } from "../context/AppContext.jsx";
 import { SERVICES } from "../data/mock.js";
 
 export default function AppNavbar() {
-  const { counter } = useApp();
+  const { counter, usuario, logout } = useApp();
   const [open, setOpen] = useState(false);
   const [openServicios, setOpenServicios] = useState(false);
   const navigate = useNavigate();
@@ -15,6 +15,11 @@ export default function AppNavbar() {
     navigate("/servicios");
     setOpen(false);
     setOpenServicios(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -52,7 +57,7 @@ export default function AppNavbar() {
               </NavLink>
             </li>
 
-            {/* Dropdown Servicios (alineado con los demás) */}
+            {/* Dropdown Servicios */}
             <li className="nav-item dropdown">
               <button
                 className="nav-link dropdown-toggle btn btn-link align-baseline px-0 py-2 text-white text-decoration-none"
@@ -134,7 +139,32 @@ export default function AppNavbar() {
             </li>
           </ul>
 
-          {/* Contador global visible (no tocar: tests dependen de esto) */}
+          {/* 🔐 Usuario logueado o botón de login */}
+          <div className="d-flex align-items-center gap-3 text-white">
+            {usuario ? (
+              <>
+                <span className="fw-semibold">
+                  <i className="bi bi-person-circle me-1"></i>
+                  {usuario.nombre}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-sm btn-outline-light"
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <button
+                className="btn btn-sm btn-light"
+                onClick={() => navigate("/login")}
+              >
+                Iniciar sesión
+              </button>
+            )}
+          </div>
+
+          {/* Contador global (se mantiene igual) */}
           <div
             className="ms-3 d-flex align-items-center gap-2"
             data-testid="counter-badge"
