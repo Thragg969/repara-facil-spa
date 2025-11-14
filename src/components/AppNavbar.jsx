@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext.jsx";
 import { SERVICES } from "../data/mock.js";
+import logoRepara from "../assets/logo_reparafacil.png";
 
 export default function AppNavbar() {
   const { counter, usuario, logout } = useApp();
@@ -25,8 +26,19 @@ export default function AppNavbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-4">
       <div className="container-fluid">
-        <Link className="navbar-brand fw-bold" to="/">
-          🔧 ReparaFácil SPA
+        {/* BRAND CON LOGO + TEXTO */}
+        <Link
+          className="navbar-brand d-flex align-items-center fw-bold"
+          to="/"
+        >
+          <img
+            src={logoRepara}
+            alt="ReparaFácil"
+            className="me-2"
+            style={{ height: "85px", width: "auto" }}
+
+          />
+          <span>ReparaFácil SPA</span>
         </Link>
 
         {/* Hamburguesa móvil */}
@@ -164,7 +176,7 @@ export default function AppNavbar() {
             )}
           </div>
 
-          {/* Contador global (se mantiene igual) */}
+          {/* Contador global */}
           <div
             className="ms-3 d-flex align-items-center gap-2"
             data-testid="counter-badge"

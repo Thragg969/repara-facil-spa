@@ -12,14 +12,16 @@ import Tecnicos from "./pages/Tecnicos.jsx";
 import Contact from "./pages/Contact.jsx";
 import Clientes from "./pages/Clientes.jsx";
 import Login from "./pages/Login.jsx";
+import Register from "./pages/Register.jsx";
 
 export default function App() {
   return (
     <AppProvider>
       <AppNavbar />
-      <main className="container my-4">
+      <main className="main-content">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           <Route path="/" element={<Home />} />
           <Route path="/servicios" element={<Servicios />} />
@@ -34,3 +36,4 @@ export default function App() {
     </AppProvider>
   );
 }
+

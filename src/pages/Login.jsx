@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useApp } from "../context/AppContext.jsx";
 
 export default function Login() {
@@ -17,9 +17,9 @@ export default function Login() {
     const ok = login(form.email, form.password);
     if (ok) {
       setError("");
-      navigate("/"); // o /clientes si quieres
+      navigate("/");
     } else {
-      setError("Credenciales incorrectas. Prueba con admin@reparafacil.cl / 123456");
+      setError("Credenciales incorrectas. Revisa tu correo y contraseña.");
     }
   };
 
@@ -31,27 +31,32 @@ export default function Login() {
             <h3 className="text-center text-primary mb-3">Iniciar sesión</h3>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label className="form-label">Correo</label>
+                <label className="form-label" htmlFor="login-email">
+                  Correo
+                </label>
                 <input
-                    type="email"
-                    name="email"
-                    className="form-control"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="admin@reparafacil.cl"
+                  id="login-email"
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="tu-correo@ejemplo.com"
                 />
               </div>
               <div className="mb-3">
-                <label className="form-label">Contraseña</label>
+                <label className="form-label" htmlFor="login-password">
+                  Contraseña
+                </label>
                 <input
-                    type="password"
-                    name="password"
-                    className="form-control"
-                    value={form.password}
-                    onChange={handleChange}
-                    required
-                    placeholder="123456"
+                  id="login-password"
+                  type="password"
+                  name="password"
+                  className="form-control"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               {error && <div className="alert alert-danger py-2">{error}</div>}
@@ -59,8 +64,9 @@ export default function Login() {
                 Entrar
               </button>
             </form>
-            <p className="text-muted small mt-3 mb-0">
-              Usuario demo: <strong>admin@reparafacil.cl</strong> / <strong>123456</strong>
+
+            <p className="text-center mt-3 mb-0 small">
+              ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
             </p>
           </div>
         </div>

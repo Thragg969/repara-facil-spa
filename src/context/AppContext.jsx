@@ -1,47 +1,79 @@
-import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  // ====== tus estados originales ======
+  // ====== tus estados actuales ======
   const [servicios, setServicios] = useState([]);
   const [tecnicos, setTecnicos] = useState([]);
   const [agenda, setAgenda] = useState([]);
 
-  // ====== funciones originales ======
+  // ====== tus funciones originales ======
   const addCita = (nuevaCita) => setAgenda((prev) => [...prev, nuevaCita]);
-  const removeCita = (id) => setAgenda((prev) => prev.filter((c) => c.id !== id));
+  const removeCita = (id) =>
+    setAgenda((prev) => prev.filter((c) => c.id !== id));
 
   // ====== contador global ======
   const [counter, setCounter] = useState(0);
   const add = () => setCounter((c) => c + 1);
   const reset = () => setCounter(0);
 
-  // ====== autenticación básica ======
+  // ====== AUTENTICACIÓN DE CLIENTE ======
   const [usuario, setUsuario] = useState(null);
 
-  // Cargar usuario desde localStorage al iniciar
+  // al cargar la app, recuperar usuario logueado si existe
   useEffect(() => {
     const guardado = localStorage.getItem("usuario");
-    if (guardado) setUsuario(JSON.parse(guardado));
+    if (guardado) {
+      setUsuario(JSON.parse(guardado));
+    }
   }, []);
 
-  // Guardar usuario cuando cambia
-  useEffect(() => {
-    if (usuario) {
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-    }
-  }, [usuario]);
+  // registrar nuevo cliente (solo cliente, no técnico/admin)
+  const registerCliente = (nombre, email, password) => {
+    const raw = localStorage.getItem("clientesAuth");
+    const clientesGuardados = raw ? JSON.parse(raw) : [];
 
-  const login = (email, password) => {
-    // Puedes modificar esto si más adelante conectas con una API real
-    if (email === "admin@reparafacil.cl" && password === "123456") {
-      const nuevoUsuario = { nombre: "Administrador", email };
-      setUsuario(nuevoUsuario);
-      localStorage.setItem("usuario", JSON.stringify(nuevoUsuario));
-      return true;
+    const yaExiste = clientesGuardados.some((c) => c.email === email);
+    if (yaExiste) {
+      return { ok: false, error: "El correo ya está registrado." };
     }
-    return false;
+
+    const nuevo = { nombre, email, password };
+    const actualizados = [...clientesGuardados, nuevo];
+    localStorage.setItem("clientesAuth", JSON.stringify(actualizados));
+
+    return { ok: true };
+  };
+
+  // login de cliente usando los datos registrados
+  const login = (email, password) => {
+    const raw = localStorage.getItem("clientesAuth");
+    const clientesGuardados = raw ? JSON.parse(raw) : [];
+
+    const encontrado = clientesGuardados.find(
+      (c) => c.email === email && c.password === password
+    );
+
+    if (!encontrado) {
+      return false;
+    }
+
+    const clienteSesion = {
+      nombre: encontrado.nombre,
+      email: encontrado.email,
+      rol: "cliente",
+    };
+
+    setUsuario(clienteSesion);
+    localStorage.setItem("usuario", JSON.stringify(clienteSesion));
+    return true;
   };
 
   const logout = () => {
@@ -49,7 +81,7 @@ export function AppProvider({ children }) {
     localStorage.removeItem("usuario");
   };
 
-  // ====== value con todo expuesto ======
+  // ====== value con todo lo que expones ======
   const value = useMemo(
     () => ({
       servicios,
@@ -60,10 +92,11 @@ export function AppProvider({ children }) {
       counter,
       add,
       reset,
-      // 🔐 nuevos estados
+      // auth
       usuario,
       login,
       logout,
+      registerCliente,
     }),
     [servicios, tecnicos, agenda, counter, usuario]
   );
