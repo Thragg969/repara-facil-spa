@@ -1,11 +1,10 @@
-// src/pages/Home.jsx
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Home.css";
 import { useApp } from "../context/AppContext.jsx";
+import heroImage from "../assets/tecnico_electrodomestico.png"; // 👈 lo dejamos igual
 
 export default function Home() {
-  // 👇 ahora usamos el contexto y navigate
   const { usuario } = useApp();
   const navigate = useNavigate();
 
@@ -30,7 +29,7 @@ export default function Home() {
               </p>
               <div className="d-flex flex-wrap gap-3">
                 <Link to="/agenda" className="btn btn-warning btn-lg">
-                  Agenda tu servicio
+                  Ver tu agenda
                 </Link>
                 <Link to="/servicios" className="btn btn-outline-light btn-lg">
                   Ver servicios
@@ -59,9 +58,9 @@ export default function Home() {
             <div className="col-lg-6 hero-image-wrapper re-float">
               <div className="hero-image-card">
                 <img
-                  src="/img/hero-reparacion.jpg"
+                  src={heroImage}
                   alt="Técnico reparando electrodoméstico"
-                  className="img-fluid rounded-4 shadow-lg"
+                  className="hero-main-image img-fluid"
                 />
                 <div className="hero-badge shadow">
                   <span className="hero-badge-icon">⭐</span>
@@ -167,8 +166,8 @@ export default function Home() {
 
               <ol className="timeline list-unstyled">
                 <li className="timeline-step">
-                  <div className="bullet">1</div>
-                  <div>
+                  <span className="bullet">1</span>
+                  <div className="step-text">
                     <h6 className="mb-1">Elige el servicio</h6>
                     <p className="text-white-50 small mb-0">
                       Selecciona el tipo de reparación que necesitas desde la
@@ -177,8 +176,8 @@ export default function Home() {
                   </div>
                 </li>
                 <li className="timeline-step">
-                  <div className="bullet">2</div>
-                  <div>
+                  <span className="bullet">2</span>
+                  <div className="step-text">
                     <h6 className="mb-1">Agenda fecha y hora</h6>
                     <p className="text-white-50 small mb-0">
                       Indica tu comuna, franja horaria y datos de contacto.
@@ -186,8 +185,8 @@ export default function Home() {
                   </div>
                 </li>
                 <li className="timeline-step">
-                  <div className="bullet">3</div>
-                  <div>
+                  <span className="bullet">3</span>
+                  <div className="step-text">
                     <h6 className="mb-1">Recibe al técnico</h6>
                     <p className="text-white-50 small mb-0">
                       Un técnico certificado te visitará para diagnosticar y
@@ -198,7 +197,7 @@ export default function Home() {
               </ol>
             </div>
 
-            {/* 👇 ESTA CAJA SOLO SE MUESTRA SI NO HAY USUARIO LOGUEADO */}
+            {/* Solo si NO hay usuario logueado */}
             {!usuario && (
               <div className="col-lg-6 re-fade-up re-delay-2">
                 <div className="cta-box p-4 rounded-4">

@@ -54,6 +54,7 @@ export function AppProvider({ children }) {
 
   // login de cliente usando los datos registrados
   const login = (email, password) => {
+    // console.log("login called with:", email
     const raw = localStorage.getItem("clientesAuth");
     const clientesGuardados = raw ? JSON.parse(raw) : [];
 

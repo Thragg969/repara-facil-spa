@@ -14,6 +14,8 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // conole.log("Submitting login:", form);
     const ok = login(form.email, form.password);
     if (ok) {
       setError("");

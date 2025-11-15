@@ -4,14 +4,23 @@ import { TECHS } from "../data/mock.js";
 
 export default function Tecnicos() {
   return (
-    <div>
-      <h2 className="mb-3 text-primary">Nuestros técnicos certificados</h2>
-      <p className="text-muted">Elige al profesional que necesitas para tu servicio.</p>
-      <div className="row g-3">
-        {TECHS.map((t) => (
-          <TechnicianCard key={t.id} tech={t} />
-        ))}
+    <section className="py-5 bg-white">
+      <div className="container">
+        <div className="mb-4">
+          <h2 className="fw-bold text-primary mb-1">
+            Nuestros técnicos certificados
+          </h2>
+          <p className="text-muted mb-0">
+            Elige al profesional que necesitas para tu servicio.
+          </p>
+        </div>
+
+        <div className="row g-4">
+          {TECHS.map((t) => (
+            <TechnicianCard key={t.id} tech={t} />
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
