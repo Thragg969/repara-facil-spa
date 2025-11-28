@@ -1,27 +1,32 @@
+// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useApp } from "../context/AppContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Login() {
-  const { login } = useApp();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
 
+  const [form, setForm] = useState({ identifier: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    // conole.log("Submitting login:", form);
-    const ok = login(form.email, form.password);
-    if (ok) {
-      setError("");
-      navigate("/");
-    } else {
-      setError("Credenciales incorrectas. Revisa tu correo y contraseña.");
+    try {
+      await login(form.identifier, form.password);
+      navigate("/"); // ruta protegida principal
+    } catch (err) {
+      setError("Usuario o contraseña incorrectos.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,22 +36,26 @@ export default function Login() {
         <div className="col-md-4">
           <div className="card p-4 shadow-sm border-0">
             <h3 className="text-center text-primary mb-3">Iniciar sesión</h3>
+
+            {error && <div className="alert alert-danger py-2">{error}</div>}
+
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label className="form-label" htmlFor="login-email">
-                  Correo
+                <label className="form-label" htmlFor="login-identifier">
+                  Usuario
                 </label>
                 <input
-                  id="login-email"
-                  type="email"
-                  name="email"
+                  id="login-identifier"
+                  type="text"
+                  name="identifier"
                   className="form-control"
-                  value={form.email}
+                  value={form.identifier}
                   onChange={handleChange}
                   required
-                  placeholder="tu-correo@ejemplo.com"
+                  placeholder="usuario o correo"
                 />
               </div>
+
               <div className="mb-3">
                 <label className="form-label" htmlFor="login-password">
                   Contraseña
@@ -61,9 +70,13 @@ export default function Login() {
                   required
                 />
               </div>
-              {error && <div className="alert alert-danger py-2">{error}</div>}
-              <button type="submit" className="btn btn-primary w-100">
-                Entrar
+
+              <button
+                type="submit"
+                className="btn btn-primary w-100"
+                disabled={loading}
+              >
+                {loading ? "Ingresando..." : "Entrar"}
               </button>
             </form>
 

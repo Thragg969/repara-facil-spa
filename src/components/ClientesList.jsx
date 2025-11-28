@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getClientes, deleteCliente } from "../services/clientesService.js";
+import { getClientes, deleteCliente } from "../api/clientesService.js";
+
+
 
 export default function ClientesList() {
   const [clientes, setClientes] = useState([]);

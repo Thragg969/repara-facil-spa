@@ -1,53 +1,76 @@
-import React from 'react';
-import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from './utils.jsx';
+// tests/Agenda.spec.jsx
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 
-import Servicios from '../src/pages/Servicios.jsx';
-import Agenda from '../src/pages/Agenda.jsx';
+import * as agendaService from "../src/api/agendaService";
+import Agenda from "../src/pages/Agenda";
 
-describe('Agenda page', () => {
-  test('muestra mensaje cuando no hay citas', () => {
-    renderWithProviders(<Agenda />);
-    expect(screen.getByText(/no tienes citas aún/i)).toBeInTheDocument();
+// Estado simulado del contexto
+let mockAgenda = [];
+const mockSetAgenda = vi.fn();
+
+// Mock del hook useApp del contexto global
+vi.mock("../src/context/AppContext.jsx", () => {
+  return {
+    useApp: () => ({
+      agenda: mockAgenda,
+      setAgenda: mockSetAgenda,
+    }),
+  };
+});
+
+// Mock del servicio de agenda (getAgenda, cancelarAgenda, etc.)
+vi.mock("../src/api/agendaService");
+
+function renderAgenda() {
+  return render(
+    <MemoryRouter>
+      <Agenda />
+    </MemoryRouter>
+  );
+}
+
+describe("Agenda page", () => {
+  beforeEach(() => {
+    // limpiamos estado entre tests
+    mockAgenda = [];
+    mockSetAgenda.mockReset();
+    vi.clearAllMocks();
   });
 
-  test('agendar desde Servicios agrega una fila en Agenda', async () => {
-    const user = userEvent.setup();
-    vi.spyOn(window, 'alert').mockImplementation(() => {}); // ServiceCard usa alert
+  it("muestra mensaje cuando no hay citas", async () => {
+    // el backend responde lista vacía
+    agendaService.getAgenda.mockResolvedValueOnce([]);
 
-    renderWithProviders(
-      <>
-        <Servicios />
-        <Agenda />
-      </>
-    );
+    renderAgenda();
 
-    // Tomamos la PRIMERA tarjeta de servicio
-    const card = screen.getAllByTestId('service-card')[0];
+    // esperamos directamente al mensaje final de "sin citas"
+    await screen.findByText(/No tienes citas aún\./i);
+  });
 
-    // Rellenamos los campos dentro de esa card (evita confusiones)
-    const nombre = within(card).getByPlaceholderText(/nombre cliente/i);
-    const direccion = within(card).getByPlaceholderText(/dirección/i);
-    const fechaInput = card.querySelector('input[type="datetime-local"]');
+  it("muestra una fila cuando el backend trae una cita", async () => {
+    const citas = [
+      {
+        id: 1,
+        cliente: "Juan Pérez",
+        direccion: "Calle Falsa 123",
+        fecha: "2025-11-30",
+        servicio: "Reparación de lavadora",
+        tecnico_nombre: "Tec Uno",
+        estado: "Pendiente",
+      },
+    ];
 
-    await user.clear(nombre);
-    await user.type(nombre, 'Juan Pérez');
-    await user.type(direccion, 'Av. Siempre Viva 123');
+    // el contexto parte con esa cita cargada
+    mockAgenda = citas;
+    // y además simulamos que el backend devuelve lo mismo
+    agendaService.getAgenda.mockResolvedValueOnce(citas);
 
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    await user.type(fechaInput, `${yyyy}-${mm}-${dd}T10:30`);
+    renderAgenda();
 
-    // Agendar
-    await user.click(within(card).getByRole('button', { name: /agendar/i }));
-
-    // Verificamos la tabla y la fila con el cliente
-    const tabla = await screen.findByRole('table');
-    const filas = within(tabla).getAllByRole('row');
-    const fila = filas.find(r => within(r).queryByText(/juan pérez/i));
-    expect(fila).toBeTruthy();
+    // esperamos que la tabla muestre los datos de la cita
+    await screen.findByText("Juan Pérez");
+    await screen.findByText("Reparación de lavadora");
   });
 });

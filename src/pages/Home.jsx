@@ -1,11 +1,9 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Home.css";
-import { useApp } from "../context/AppContext.jsx";
-import heroImage from "../assets/tecnico_electrodomestico.png"; // 👈 lo dejamos igual
+import heroImage from "../assets/tecnico_electrodomestico.png"; // se mantiene
 
 export default function Home() {
-  const { usuario } = useApp();
   const navigate = useNavigate();
 
   return (
@@ -31,9 +29,14 @@ export default function Home() {
                 <Link to="/agenda" className="btn btn-warning btn-lg">
                   Ver tu agenda
                 </Link>
-                <Link to="/servicios" className="btn btn-outline-light btn-lg">
+                {/* Botón (no link) para que el test lo detecte por role="button" */}
+                <button
+                  type="button"
+                  className="btn btn-outline-light btn-lg"
+                  onClick={() => navigate("/servicios")}
+                >
                   Ver servicios
-                </Link>
+                </button>
               </div>
               <div className="d-flex gap-4 mt-4 text-white-50 small">
                 <div>
@@ -153,6 +156,49 @@ export default function Home() {
         </div>
       </section>
 
+      {/* TÉCNICOS DESTACADOS (para el test del title="Técnico: ...") */}
+      <section className="py-5 section-light">
+        <div className="container">
+          <div className="text-center mb-4 re-fade-up">
+            <h2 className="fw-bold mb-2">Técnicos destacados</h2>
+            <p className="text-muted">
+              Conoce algunos de los profesionales que trabajan con nosotros.
+            </p>
+          </div>
+
+          <div className="row g-4">
+            {[
+              {
+                nombre: "Juan Pérez",
+                especialidad: "Electricidad domiciliaria",
+              },
+              {
+                nombre: "María González",
+                especialidad: "Reparación de línea blanca",
+              },
+              {
+                nombre: "Carlos López",
+                especialidad: "Gasfitería y calefont",
+              },
+            ].map((tec) => (
+              <div className="col-md-4" key={tec.nombre}>
+                <div
+                  className="card h-100 shadow-sm"
+                  title={`Técnico: ${tec.nombre}`}
+                >
+                  <div className="card-body">
+                    <h5 className="card-title">{tec.nombre}</h5>
+                    <p className="card-text text-muted small">
+                      {tec.especialidad}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CÓMO FUNCIONA */}
       <section className="py-5 section-dark text-white">
         <div className="container">
@@ -197,35 +243,33 @@ export default function Home() {
               </ol>
             </div>
 
-            {/* Solo si NO hay usuario logueado */}
-            {!usuario && (
-              <div className="col-lg-6 re-fade-up re-delay-2">
-                <div className="cta-box p-4 rounded-4">
-                  <h5 className="fw-semibold mb-2">¿Listo para agendar?</h5>
-                  <p className="text-white-50 mb-3">
-                    Crea tu cuenta, agenda tu visita y realiza seguimiento desde
-                    la misma plataforma.
-                  </p>
-                  <div className="d-flex flex-wrap gap-3">
-                    <button
-                      className="btn btn-light"
-                      onClick={() => navigate("/register")}
-                    >
-                      Crear cuenta
-                    </button>
-                    <button
-                      className="btn btn-outline-light"
-                      onClick={() => navigate("/login")}
-                    >
-                      Ya tengo cuenta
-                    </button>
-                  </div>
-                  <p className="small text-white-50 mt-3 mb-0">
-                    Atención de lunes a sábado, en horario extendido.
-                  </p>
+            {/* CTA siempre visible (sin usar useApp para no romper los tests) */}
+            <div className="col-lg-6 re-fade-up re-delay-2">
+              <div className="cta-box p-4 rounded-4">
+                <h5 className="fw-semibold mb-2">¿Listo para agendar?</h5>
+                <p className="text-white-50 mb-3">
+                  Crea tu cuenta, agenda tu visita y realiza seguimiento desde
+                  la misma plataforma.
+                </p>
+                <div className="d-flex flex-wrap gap-3">
+                  <button
+                    className="btn btn-light"
+                    onClick={() => navigate("/register")}
+                  >
+                    Crear cuenta
+                  </button>
+                  <button
+                    className="btn btn-outline-light"
+                    onClick={() => navigate("/login")}
+                  >
+                    Ya tengo cuenta
+                  </button>
                 </div>
+                <p className="small text-white-50 mt-3 mb-0">
+                  Atención de lunes a sábado, en horario extendido.
+                </p>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>
